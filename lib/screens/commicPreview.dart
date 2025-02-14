@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:katha/screens/picture.dart';
 
 class ComicPreviewPage extends StatelessWidget {
   @override
@@ -18,7 +19,7 @@ class ComicContent extends StatefulWidget {
 class _ComicContentState extends State<ComicContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool isSubscribed = false;  // Subscription status flag
+  bool isSubscribed = false;
 
   @override
   void initState() {
@@ -36,8 +37,11 @@ class _ComicContentState extends State<ComicContent>
             children: [
               Container(
                 constraints: BoxConstraints(maxHeight: 200),
-                child: Image.asset('assets/banner.png',
-                    width: double.infinity, fit: BoxFit.cover),
+                child: Image.asset(
+                  'assets/solo.jpg',
+                  width: double.infinity,
+                  fit: BoxFit.cover, // Ensures the image fills properly
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
@@ -51,7 +55,7 @@ class _ComicContentState extends State<ComicContent>
                         width: 30,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Colors.black.withOpacity(0.6),
+                          color: Colors.black,
                         ),
                         child: Center(
                           child: Icon(Icons.arrow_back_ios_sharp,
@@ -61,7 +65,7 @@ class _ComicContentState extends State<ComicContent>
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:  Colors.black.withOpacity(0.6),
+                        backgroundColor: Colors.black, // Changed to green
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -90,13 +94,13 @@ class _ComicContentState extends State<ComicContent>
                   spacing: 8.0,
                   children: [
                     _buildTag('Action'),
-                    _buildTag('Indian Mythology'),
+                    _buildTag('Adventure'),
                     _buildTag('🎉NEW', isNew: true),
                   ],
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Vikram Vetal',
+                  'Solo Leveling',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -106,7 +110,7 @@ class _ComicContentState extends State<ComicContent>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('VrindKavi', style: TextStyle(color: Colors.white70)),
+                    Text('Chugong', style: TextStyle(color: Colors.white70)),
                     Text('Read More',
                         style: TextStyle(
                             color: Colors.white,
@@ -117,7 +121,6 @@ class _ComicContentState extends State<ComicContent>
             ),
           ),
 
-          // Tabs for Preview and Episodes
           TabBar(
             controller: _tabController,
             labelColor: Colors.white,
@@ -127,7 +130,7 @@ class _ComicContentState extends State<ComicContent>
             unselectedLabelStyle: TextStyle(fontSize: 20),
             tabs: [
               Tab(text: 'Preview'),
-              Tab(text: 'Episodes' ),
+              Tab(text: 'Episodes'),
             ],
           ),
 
@@ -137,7 +140,7 @@ class _ComicContentState extends State<ComicContent>
               controller: _tabController,
               children: [
                 _buildPreviewTab(),
-                isSubscribed ? _buildEpisodesTab() : _buildLockedTab(),
+                isSubscribed ? _buildEpisodesTab(context) : _buildLockedTab(),
               ],
             ),
           ),
@@ -155,114 +158,110 @@ class _ComicContentState extends State<ComicContent>
       ),
       child: Text(
         tag,
-        style: TextStyle(color: !isNew ? Colors.white : Colors.green, fontSize: 15),
+        style: TextStyle(color: !isNew ? Colors.white : Colors.black, fontSize: 15),
       ),
     );
   }
 
   Widget _buildPreviewTab() {
-    return Column(
-      children: [
-        SizedBox(height: 20),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 16),
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.grey[850],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: Text(
-              'Show Ad Here',
-              style: TextStyle(color: Colors.white54, fontSize: 16),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(height: 20),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.grey[850],
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                'Show Ad Here',
+                style: TextStyle(color: Colors.white54, fontSize: 16),
+              ),
             ),
           ),
-        ),
-        SizedBox(height: 20),
-        Image.asset(
-            'assets/preview.png',
+          SizedBox(height: 20),
+          Container(
             width: double.infinity,
-          fit: BoxFit.fill,
-        )
-      ],
+            child: Image.asset(
+              'assets/level1.jpg',
+              fit: BoxFit.fitWidth, // Ensures the full image is visible
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  // Episodes Tab (Visible after subscribing)
-  Widget _buildEpisodesTab() {
+
+
+
+
+
+  Widget _buildEpisodesTab(BuildContext context) {
     final episodes = [
-      {'title': 'Episode 3', 'image': 'assets/panel1.png'},
-      {'title': 'Episode 2', 'image': 'assets/panel2.png'},
-      {'title': 'Episode 1', 'image': 'assets/panel3.png'},
-      {'title': 'Preview', 'image': 'assets/panel1.png'},
+      {'title': 'Episode 3', 'image': 'assets/solo.jpg'},
+      {'title': 'Episode 2', 'image': 'assets/solo.jpg'},
+      {'title': 'Episode 1', 'image': 'assets/solo.jpg'},
     ];
 
-    return Column(
-      children: [
-        SizedBox(height: 20),
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 16),
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.grey[850],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Center(
-            child: Text(
-              'Show Ad Here',
-              style: TextStyle(color: Colors.white54, fontSize: 16),
+    return ListView.builder(
+      padding: EdgeInsets.all(16),
+      itemCount: episodes.length,
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: () {
+            if (episodes[index]['title'] == 'Episode 1') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PicturePage()),
+              );
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/solo.jpg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    episodes[index]['title']!,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    'Read for free\nwith ads',
+                    textAlign: TextAlign.right,
+                    style: TextStyle(
+                      color: Colors.lightGreenAccent,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            padding: EdgeInsets.all(16),
-            itemCount: episodes.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(
-                        'assets/thumbnail.png',
-                        width: 60,
-                        height: 60,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        episodes[index]['title']!,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      'Read for free\nwith ads',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        color: Colors.lightGreenAccent,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
-
-  // Locked Tab (Visible when not subscribed)
   Widget _buildLockedTab() {
     return Center(
       child: Column(

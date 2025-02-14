@@ -14,8 +14,6 @@ class LoginPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Spacer(flex: 3),
-
-            // App Name with Cormorant Unicase Font
             Text(
               'katha',
               style: GoogleFonts.cormorantUnicase(
@@ -51,7 +49,7 @@ class LoginPage extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 15),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/number'); // Navigate to NumberPage
+                  Navigator.pushNamed(context, '/number');
                 },
                 child: Text(
                   'Continue with Phone Number',

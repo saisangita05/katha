@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "475802808616",
+    "firebase_url": "https://katha-webtoon-default-rtdb.firebaseio.com",
+    "project_id": "katha-webtoon",
+    "storage_bucket": "katha-webtoon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475802808616:android:e9157b1d645ac71b21201d",
+        "android_client_info": {
+          "package_name": "com.example.katha"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOnYVHkucswcPezEY_l5tbMbIiNB6SEZk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

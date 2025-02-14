@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"katha-webtoon","appId":"1:475802808616:android:e9157b1d645ac71b21201d","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"katha-webtoon","configurations":{"android":"1:475802808616:android:e9157b1d645ac71b21201d","ios":"1:475802808616:ios:7b61b0d28a627bfd21201d"}}}}}}

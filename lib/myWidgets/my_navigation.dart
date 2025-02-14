@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:katha/screens/homepage.dart';
+import 'package:katha/screens/library.dart';
+import 'package:katha/screens/reward.dart';
+import 'package:katha/screens/search.dart';
+import 'package:katha/screens/profile.dart';// Import RewardPage
 
 class NavigationPage extends StatefulWidget {
   @override
@@ -19,12 +23,6 @@ class _NavigationPageState extends State<NavigationPage> {
   }
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView(
@@ -36,7 +34,12 @@ class _NavigationPageState extends State<NavigationPage> {
         },
         children: [
           HomePage(),
-          // Add other pages here...
+          LibraryPage(),
+          RewardPage(),
+          SearchPage(),
+          ProfilePage(),// ✅ Navigates to RewardPage when clicked
+          //Center(child: Text('Search Page', style: TextStyle(color: Colors.white))),
+         // Center(child: Text('Profile Page', style: TextStyle(color: Colors.white))),
         ],
       ),
       bottomNavigationBar: Container(
@@ -44,7 +47,7 @@ class _NavigationPageState extends State<NavigationPage> {
         decoration: BoxDecoration(
           color: Colors.black,
           border: Border(
-            top: BorderSide(color: Colors.grey.shade800, width: 0.5), // Optional separator
+            top: BorderSide(color: Colors.grey.shade800, width: 0.5),
           ),
         ),
         child: Row(
@@ -52,7 +55,7 @@ class _NavigationPageState extends State<NavigationPage> {
           children: [
             _buildNavItem(Icons.home, 'Home', 0),
             _buildNavItem(Icons.book_outlined, 'Library', 1),
-            _buildNavItem(Icons.card_giftcard, 'Rewards', 2),
+            _buildNavItem(Icons.card_giftcard, 'Rewards', 2), // ✅ Navigates to RewardPage
             _buildNavItem(Icons.search, 'Search', 3),
             _buildNavItem(Icons.circle, 'Profile', 4),
           ],
