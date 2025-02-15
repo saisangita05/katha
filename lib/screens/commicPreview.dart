@@ -187,7 +187,7 @@ class _ComicContentState extends State<ComicContent>
             width: double.infinity,
             child: Image.asset(
               'assets/level1.jpg',
-              fit: BoxFit.fitWidth, // Ensures the full image is visible
+              fit: BoxFit.fitWidth,
             ),
           ),
         ],

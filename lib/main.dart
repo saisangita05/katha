@@ -9,6 +9,7 @@ import 'package:katha/myWidgets/my_navigation.dart';
 import 'package:katha/supabase_client.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:katha/screens/splashscreen.dart'; // Import SplashScreen
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,13 +29,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(),
+        '/': (context) => SplashScreen(), // Updated to show SplashScreen first
+        '/login': (context) => LoginPage(),
         '/number': (context) => NumberPage(),
         '/otp': (context) => OtpPage(),
         '/home': (context) => HomePage(),
         '/navigate': (context) => NavigationPage(),
         '/preview': (context) => ComicPreviewPage(),
-        '/library': (context) => LibraryPage(), // Added Library Page Route
+        '/library': (context) => LibraryPage(),
       },
     );
   }
