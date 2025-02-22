@@ -66,7 +66,6 @@ class LoginPage extends StatelessWidget {
             Navigator.pushNamed(context, '/navigate');
           },
 
-
         child: Text(
                 'Continue as a guest',
                 style: TextStyle(

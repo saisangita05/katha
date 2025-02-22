@@ -11,8 +11,9 @@ class _ProfilePageState extends State<ProfilePage> {
   File? _profileImage; // To store the selected profile image
   final picker = ImagePicker();
   final String userName = "Sai Sangita Adhek"; // Example user name
+  final String phoneNumber = "+91 - 8249553946"; // Example phone number
 
-  // Function to pick image from gallery
+  // Function to pick an image from the gallery
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -22,100 +23,152 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // Function to remove the profile image
+  void _removeImage() {
+    setState(() {
+      _profileImage = null;
+    });
+  }
+
+  // Show options when the user taps the profile image
+  void _showImageOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text("Pick Image"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickImage();
+                },
+              ),
+              if (_profileImage != null)
+                ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text("Remove Image"),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _removeImage();
+                  },
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-        backgroundColor: Color(0xFFA3D749),
-      ),
-      backgroundColor: Colors.black87,
-      body: SingleChildScrollView(
+      backgroundColor: Colors.black,
+      body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Profile Image with Clickable Option to Change
+              // Profile Image (Clickable)
               GestureDetector(
-                onTap: _pickImage,
+                onTap: _showImageOptions,
                 child: Stack(
                   children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!) as ImageProvider
-                          : AssetImage("assets/sai.jpg"), // Default Image
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.lightGreenAccent.withOpacity(0.5),
+                            blurRadius: 20,
+                            spreadRadius: 3,
+                          ),
+                        ],
+                      ),
+                      child: CircleAvatar(
+                        radius: 65,
+                        backgroundImage: _profileImage != null
+                            ? FileImage(_profileImage!) as ImageProvider
+                            : AssetImage(""), // Default Image
+                      ),
                     ),
                     Positioned(
                       bottom: 0,
                       right: 0,
                       child: CircleAvatar(
                         backgroundColor: Colors.black87,
-                        radius: 18,
+                        radius: 15,
                         child: Icon(Icons.camera_alt, color: Colors.white),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 30),
 
               // User Name
               Text(
                 userName,
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-
-              // Wishlist Section
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Wishlist Comics',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 7),
 
-              // Wishlist List
-              _buildWishlist(),
+              // Phone Number
+              Text(
+                phoneNumber,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 60),
+
+              // Status Message
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  "We're currently in the process of building your profile and a community. Stay tuned for updates!",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+              const SizedBox(height: 100),
+
+              // Logout Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Implement Logout Functionality
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFA3D749),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  // Wishlist Comic Item
-  Widget _buildWishlist() {
-    List<String> wishlistComics = [
-      "One Piece",
-      "Naruto",
-      "Demon Slayer",
-      "Attack on Titan",
-      "Death Note",
-      "Dragon Ball",
-    ]; // Example wishlist
-
-    return wishlistComics.isNotEmpty
-        ? Column(
-      children: wishlistComics.map((comic) => _buildWishlistItem(comic)).toList(),
-    )
-        : Center(
-      child: Text(
-        "Your wishlist is empty!",
-        style: TextStyle(color: Colors.white70, fontSize: 16),
-      ),
-    );
-  }
-
-  Widget _buildWishlistItem(String comic) {
-    return Card(
-      color: Colors.grey[850],
-      child: ListTile(
-        leading: Icon(Icons.bookmark, color: Colors.blueGrey),
-        title: Text(comic, style: TextStyle(color: Colors.white)),
       ),
     );
   }

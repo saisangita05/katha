@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:katha/screens/homepage.dart';
-import 'package:katha/screens/library.dart';
-import 'package:katha/screens/reward.dart';
-import 'package:katha/screens/search.dart';
-import 'package:katha/screens/profile.dart';// Import RewardPage
+import 'package:katha/screens/membership.dart';
+import 'package:katha/screens/profile.dart'; // Import ProfilePage
 
 class NavigationPage extends StatefulWidget {
   @override
@@ -18,47 +17,52 @@ class _NavigationPageState extends State<NavigationPage> {
     setState(() {
       _selectedIndex = index;
     });
-    _pageController.animateToPage(index,
-        duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+    _pageController.jumpToPage(index);
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_selectedIndex != 0) {
+      setState(() {
+        _selectedIndex = 0;
+      });
+      _pageController.jumpToPage(0);
+      return false;
+    }
+
+    SystemNavigator.pop();
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        children: [
-          HomePage(),
-          LibraryPage(),
-          RewardPage(),
-          SearchPage(),
-          ProfilePage(),// ✅ Navigates to RewardPage when clicked
-          //Center(child: Text('Search Page', style: TextStyle(color: Colors.white))),
-         // Center(child: Text('Profile Page', style: TextStyle(color: Colors.white))),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border(
-            top: BorderSide(color: Colors.grey.shade800, width: 0.5),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+    return WillPopScope(
+      onWillPop: _onWillPop, // Handle back button press
+      child: Scaffold(
+        body: PageView(
+          controller: _pageController,
+          physics: NeverScrollableScrollPhysics(), // Disable swipe navigation
           children: [
-            _buildNavItem(Icons.home, 'Home', 0),
-            _buildNavItem(Icons.book_outlined, 'Library', 1),
-            _buildNavItem(Icons.card_giftcard, 'Rewards', 2), // ✅ Navigates to RewardPage
-            _buildNavItem(Icons.search, 'Search', 3),
-            _buildNavItem(Icons.circle, 'Profile', 4),
+            HomePage(),
+            MembershipPage(),
+            ProfilePage(),
           ],
+        ),
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            border: Border(
+              top: BorderSide(color: Colors.grey.shade800, width: 0.5),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(Icons.home, 'Home', 0),
+              _buildNavItem(Icons.card_membership_rounded, 'Membership', 1),
+              _buildNavItem(Icons.person, 'Profile', 2),
+            ],
+          ),
         ),
       ),
     );

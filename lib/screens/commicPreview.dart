@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:katha/screens/picture.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'parshuram1.dart'; // ✅ Import ParshuramEpisodePage
 
 class ComicPreviewPage extends StatelessWidget {
   @override
@@ -19,36 +21,87 @@ class ComicContent extends StatefulWidget {
 class _ComicContentState extends State<ComicContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool isSubscribed = false;
+  String? bannerImage;
+  String? previewImage;
+  String? parshuramImage;
+  List<String> episodes = ['Episode 1', 'Episode 2', 'Episode 3'];
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    fetchEpisodes();
+  }
+
+  Future<void> fetchImages() async {
+    try {
+      DocumentSnapshot previewSnapshot = await FirebaseFirestore.instance
+          .collection('preview')
+          .doc('parshuram')
+          .get();
+
+      DocumentSnapshot comicsSnapshot = await FirebaseFirestore.instance
+          .collection('comics')
+          .doc('images')
+          .get();
+
+      if (previewSnapshot.exists && comicsSnapshot.exists) {
+        setState(() {
+          bannerImage = previewSnapshot['parshuram'];
+          previewImage = previewSnapshot['preview'];
+          parshuramImage = comicsSnapshot['parshuram'];
+        });
+      }
+    } catch (e) {
+      print('Error fetching images: $e');
+    }
+  }
+
+  Future<void> fetchEpisodes() async {
+    try {
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('comics')
+          .get();
+
+      if (snapshot.docs.isNotEmpty) {
+        setState(() {
+          episodes.addAll(snapshot.docs.map((doc) => doc.id).toList());
+        });
+      }
+    } catch (e) {
+      print('Error fetching episodes: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
+    return FutureBuilder(
+      future: fetchImages(),
+      builder: (context, snapshot) {
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                constraints: BoxConstraints(maxHeight: 200),
-                child: Image.asset(
-                  'assets/solo.jpg',
-                  width: double.infinity,
-                  fit: BoxFit.cover, // Ensures the image fills properly
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 65, horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
+              Stack(
+                children: [
+                  Container(
+                    constraints: BoxConstraints(maxHeight: 250),
+                    child: bannerImage != null
+                        ? CachedNetworkImage(
+                      imageUrl: bannerImage!,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(color: Color(0xFFA3D749)),
+                      errorWidget: (context, url, error) =>
+                          Icon(Icons.error),
+                    )
+                        : Container(height: 200, color: Colors.black),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 35, horizontal: 20),
+                    child: GestureDetector(
                       onTap: () => Navigator.pop(context),
                       child: Container(
                         height: 30,
@@ -63,103 +116,79 @@ class _ComicContentState extends State<ComicContent>
                         ),
                       ),
                     ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black, // Changed to green
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 20,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Parshuram: Blood and Dharma', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text('VrindKavi', style: TextStyle(color: Colors.white70, fontSize: 15)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              padding: EdgeInsets.all(6),
+                              child: Text('Action', style: TextStyle(color: Colors.white, fontSize: 13),),
+                            ),
+                            SizedBox(width: 5,),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              padding: EdgeInsets.all(6),
+                              child: Text('Indian Mythology', style: TextStyle(color: Colors.white, fontSize: 13),),
+                            ),
+                            SizedBox(width: 5,),
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              padding: EdgeInsets.all(6),
+                              child: Text('🎉New', style: TextStyle(color: Color(0xFF22D575), fontSize: 13),),
+                            ),
+                          ],
                         ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isSubscribed = true;
-                        });
-                      },
-                      child: Text(
-                        isSubscribed ? 'Subscribed' : 'Subscribe',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
+                        SizedBox(height: 10,)
+                      ],
+                    )
+                  )
+                ],
+              ),
+              TabBar(
+                controller: _tabController,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white54,
+                indicatorColor: Colors.lightGreenAccent,
+                labelStyle:
+                TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                unselectedLabelStyle: TextStyle(fontSize: 16),
+                tabs: [
+                  Tab(text: 'Preview',),
+                  Tab(text: 'Episodes'),
+                ],
+              ),
+              Container(
+                height: 500,
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildPreviewTab(),
+                    _buildEpisodesTab(context),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  spacing: 8.0,
-                  children: [
-                    _buildTag('Action'),
-                    _buildTag('Adventure'),
-                    _buildTag('🎉NEW', isNew: true),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Solo Leveling',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Chugong', style: TextStyle(color: Colors.white70)),
-                    Text('Read More',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          TabBar(
-            controller: _tabController,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white54,
-            indicatorColor: Colors.lightGreenAccent,
-            labelStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            unselectedLabelStyle: TextStyle(fontSize: 20),
-            tabs: [
-              Tab(text: 'Preview'),
-              Tab(text: 'Episodes'),
-            ],
-          ),
-
-          Container(
-            height: 500,
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildPreviewTab(),
-                isSubscribed ? _buildEpisodesTab(context) : _buildLockedTab(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTag(String tag, {bool isNew = false}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Text(
-        tag,
-        style: TextStyle(color: !isNew ? Colors.white : Colors.black, fontSize: 15),
-      ),
+        );
+      },
     );
   }
 
@@ -169,112 +198,81 @@ class _ComicContentState extends State<ComicContent>
         children: [
           SizedBox(height: 20),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 16),
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(
-                'Show Ad Here',
-                style: TextStyle(color: Colors.white54, fontSize: 16),
-              ),
-            ),
-          ),
-          SizedBox(height: 20),
-          Container(
             width: double.infinity,
-            child: Image.asset(
-              'assets/level1.jpg',
+            child: previewImage != null
+                ? CachedNetworkImage(
+              imageUrl: previewImage!,
               fit: BoxFit.fitWidth,
-            ),
+              placeholder: (context, url) =>
+                  CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            )
+                : Container(height: 300, color: Colors.black),
           ),
         ],
       ),
     );
   }
 
-
-
-
-
-
   Widget _buildEpisodesTab(BuildContext context) {
-    final episodes = [
-      {'title': 'Episode 3', 'image': 'assets/solo.jpg'},
-      {'title': 'Episode 2', 'image': 'assets/solo.jpg'},
-      {'title': 'Episode 1', 'image': 'assets/solo.jpg'},
-    ];
-
     return ListView.builder(
-      padding: EdgeInsets.all(16),
       itemCount: episodes.length,
       itemBuilder: (context, index) {
+        bool isComingSoon = index == 1 || index == 2;
+
         return GestureDetector(
           onTap: () {
-            if (episodes[index]['title'] == 'Episode 1') {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PicturePage()),
-              );
-            }
+          if (!isComingSoon) {
+            Navigator.pushNamed(context, '/parshuram');
+      }
           },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+          child: Container(
+            padding: EdgeInsets.all(10),
+            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Row(
               children: [
-                ClipRRect(
+                parshuramImage != null
+                    ? ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/solo.jpg',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
+                      child: CachedNetworkImage(
+                          width: 80,
+                          height: 80,
+                                        imageUrl: parshuramImage!,
+                                        fit: BoxFit.fill,
+                                        placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) =>
+                          Icon(Icons.error, color: Colors.red),
+                                    ),
+                    )
+                    : Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.grey[800],
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 15),
                 Expanded(
                   child: Text(
-                    episodes[index]['title']!,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    episodes[index],
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
-                Flexible(
-                  child: Text(
-                    'Read for free\nwith ads',
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      color: Colors.lightGreenAccent,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
+                isComingSoon
+                    ? Text(
+                  'Coming Soon',
+                  style: TextStyle(color: Color(0xFFA3D749), fontSize: 14),
+                )
+                    : Icon(Icons.play_circle_fill, color: Colors.white70),
               ],
             ),
           ),
         );
-      },
-    );
-  }
 
-  Widget _buildLockedTab() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.lock, color: Colors.white54, size: 50),
-          SizedBox(height: 10),
-          Text(
-            'Subscribe to view Episodes!',
-            style: TextStyle(color: Colors.white70, fontSize: 16),
-          ),
-        ],
-      ),
+      },
     );
   }
 
